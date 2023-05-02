@@ -15,10 +15,11 @@ const PRODUCTS = [
   {category:"Vegetables", price:"$14", stocked: true, name: "Pumpkin"},
 ];
 
-const FilterableProductTable = () => {
+const FilterableProductTable = ({products}) => {
   return (
   <div>
      <SearchBar/>
+     <ProductTable products={products}/>
   </div>
   );
 };
@@ -35,27 +36,61 @@ const SearchBar = () => {
   );
 }
 
-const ProductTable = () => {
+const ProductTable = ({products}) => {
+  const rows =[]; // array to add category in row
+  let lastCategory = null;
+
+  products.forEach((product) => { //loop to get the category of product
+    if(product.category != lastCategory) {
+      rows.push(
+        <ProductCategoryRow 
+          category = {product.category}
+          key = {product.category}
+         />
+      );
+    }
+
+    rows.push(<ProductRow product ={product} key = {product.name} />); // to add product row
+    lastCategory = product.category
+  });
+
   return (
-    <div>
-      <ProductCategoryRow/>
-      <ProductRow/>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Price</th>
+        </tr>
+        </thead>
+        <tbody> {rows} </tbody>
+    </table>
   )
 }
 
-const ProductCategoryRow = () => {
+const ProductCategoryRow = ({category}) => {
+  return (
+    <tr>
+      <th colSpan="2">
+        {category}
+      </th>
+    </tr>
+  );
+};
 
-}
-
-const ProductRow = () => {
-
+const ProductRow = ({product}) => {
+  return (
+    <tr>
+      <td style={{color: product.stocked ? "black" : "red"}}>{product.name}</td>
+      <td>{product.price}</td>
+    </tr>
+  );
 }
 
 function App() {
   const [count, setCount] = useState(0);
+
   return (
-    <FilterableProductTable/>
+    <FilterableProductTable products = {PRODUCTS}/>
   )
 }
 
