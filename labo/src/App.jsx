@@ -87,8 +87,6 @@ const ProductRow = ({product}) => {
 }
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <FilterableProductTable products = {PRODUCTS}/>
   )
