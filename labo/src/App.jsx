@@ -1,56 +1,80 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
 
 
 const PRODUCTS = [
-  {category:"Fruits", price:"$5", stocked: true, name: "Apple"},
-  {category:"Fruits", price:"$3", stocked: true, name: "Orange"},
-  {category:"Fruits", price:"$8", stocked: false, name: "Abrichot"},
+  { category: "Fruits", price: "$5", stocked: true, name: "Apple" },
+  { category: "Fruits", price: "$3", stocked: true, name: "Orange" },
+  { category: "Fruits", price: "$8", stocked: false, name: "Abrichot" },
 
-  {category:"Vegetables", price:"$7", stocked: true, name: "Potato"},
-  {category:"Vegetables", price:"$10", stocked: false, name: "Spinach"},
-  {category:"Vegetables", price:"$14", stocked: true, name: "Pumpkin"},
+  { category: "Vegetables", price: "$7", stocked: true, name: "Potato" },
+  { category: "Vegetables", price: "$10", stocked: false, name: "Spinach" },
+  { category: "Vegetables", price: "$14", stocked: true, name: "Pumpkin" },
 ];
 
-const FilterableProductTable = ({products}) => {
+
+const FilterableProductTable = ({ products }) => {
+  const [filterText, setFilterText] = useState("");
+  const [inStockOnly, setInStockOnly] = useState(false);
   return (
-  <div>
-     <SearchBar/>
-     <ProductTable products={products}/>
-  </div>
+    <div>
+      <SearchBar
+        filterText={filterText}
+        inStockOnly={inStockOnly}
+        onFilterTextChange={setFilterText}
+        onInStockOnlyChange={setInStockOnly}
+      />
+      <ProductTable
+        products={products}
+        filterText={filterText}
+        inStockOnly={inStockOnly}
+         />
+    </div>
   );
 };
 
-const SearchBar = () => {
+const SearchBar = (onFilterTextChange, onInStockOnlyChange, filterText, inStockOnly) => {
   return (
     <form>
-      <input style={{display: "block"}} type="text" placeholder="Search ..."/>
+      <input
+        value={filterText}
+        style={{ display: "block" }}
+        type="text"
+        placeholder="Search ..."
+        onChange={(e) => onFilterTextChange(e.target.value)}
+      />
       <label>
-        <input type="checkbox"/>
+        <input
+          checked={inStockOnly}
+          type="checkbox"
+          onChange={(e) => onInStockOnlyChange(e.target.checked)} />
         {''} Only show products in stock
       </label>
     </form>
   );
 }
 
-const ProductTable = ({products}) => {
-  const rows =[]; // array to add category in row
+const ProductTable = ({ products, filterText, inStockOnly }) => {
+  const rows = []; // array to add category in row
   let lastCategory = null;
 
-  products.forEach((product) => { //loop to get the category of product
-    if(product.category != lastCategory) {
+  products.forEach((product) => {//loop to get the category of product
+    if (product.name.toLowerCase().indexOf(filterText.toLowerCase()) == -1) {
+      return;
+    }
+    if (inStockOnly && !product.stocked) { // if user checked the checkbox and the product not stocked then we don't need to return it 
+      return
+    }
+
+    if (product.category != lastCategory) {
       rows.push(
-        <ProductCategoryRow 
-          category = {product.category}
-          key = {product.category}
-         />
+        <ProductCategoryRow
+          category={product.category}
+          key={product.category}
+        />
       );
     }
 
-    rows.push(<ProductRow product ={product} key = {product.name} />); // to add product row
+    rows.push(<ProductRow product={product} key={product.name} />); // to add product row
     lastCategory = product.category
   });
 
@@ -61,13 +85,13 @@ const ProductTable = ({products}) => {
           <th>Name</th>
           <th>Price</th>
         </tr>
-        </thead>
-        <tbody> {rows} </tbody>
+      </thead>
+      <tbody>{rows}</tbody>
     </table>
   )
 }
 
-const ProductCategoryRow = ({category}) => {
+const ProductCategoryRow = ({ category }) => {
   return (
     <tr>
       <th colSpan="2">
@@ -77,10 +101,10 @@ const ProductCategoryRow = ({category}) => {
   );
 };
 
-const ProductRow = ({product}) => {
+const ProductRow = ({ product }) => {
   return (
     <tr>
-      <td style={{color: product.stocked ? "black" : "red"}}>{product.name}</td>
+      <td style={{ color: product.stocked ? "black" : "red" }}>{product.name}</td>
       <td>{product.price}</td>
     </tr>
   );
@@ -88,7 +112,7 @@ const ProductRow = ({product}) => {
 
 function App() {
   return (
-    <FilterableProductTable products = {PRODUCTS}/>
+    <FilterableProductTable products={PRODUCTS} />
   )
 }
 
